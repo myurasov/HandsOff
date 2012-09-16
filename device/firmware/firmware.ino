@@ -3,22 +3,22 @@
  *  (c) Mikhail Yurasov, 2012
  */
 
- // output pins
- #define PIN_SPK 49
- #define PIN_LED_R 47
- #define PIN_LED_Y 45
- #define PIN_LED_G 43
- #define PIN_PUMP 46 // NO
- #define PIN_BUZZER 48 // NC
+// output pins
+#define PIN_SPK 49
+#define PIN_LED_R 47
+#define PIN_LED_Y 45
+#define PIN_LED_G 43
+#define PIN_PUMP 46 // NO
+#define PIN_BUZZER 48 // NC
 
 // on/off constants
 #define ON 1
 #define OFF 0
 
- // led constants
- #define R PIN_LED_R
- #define Y PIN_LED_Y
- #define G PIN_LED_G
+// led constants
+#define R PIN_LED_R
+#define Y PIN_LED_Y
+#define G PIN_LED_G
 
 /**
  * Init
