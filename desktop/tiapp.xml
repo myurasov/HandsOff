@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ti:app xmlns:ti="http://ti.appcelerator.org">
+    <sdk-version>1.1.0</sdk-version>
+    <guid>8b64dfe4-a24f-4b8a-b2d9-585f002d084c</guid>
+    <!-- These values are edited/maintained by Titanium Developer -->
+    <id>me.yurasov.atth</id>
+    <name>ATTH</name>
+    <version>1.0</version>
+    <publisher>misha</publisher>
+    <url>http://</url>
+    <description>not specified</description>
+    <icon>default_app_logo.png</icon>
+    <copyright>2012 by misha</copyright>
+    <!-- Window Definition - these values can be edited -->
+    <window>
+        <id>initial</id>
+        <title>DeskTest</title>
+        <url>app://index.html</url>
+        <width>1280</width>
+        <max-width>3000</max-width>
+        <min-width>0</min-width>
+        <height>800</height>
+        <max-height>800</max-height>
+        <min-height>800</min-height>
+        <fullscreen>false</fullscreen>
+        <resizable>false</resizable>
+        <chrome scrollbars="true">true</chrome>
+        <maximizable>true</maximizable>
+        <minimizable>true</minimizable>
+        <closeable>true</closeable>
+    </window>
+</ti:app>

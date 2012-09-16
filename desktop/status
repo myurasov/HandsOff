@@ -1,0 +1,2 @@
+#!/bin/bash
+system_profiler SPUSBDataType | grep 9101600073078b0a25e694ffeb69d656bfbdb869

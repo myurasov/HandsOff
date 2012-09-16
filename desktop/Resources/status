@@ -1,0 +1,3 @@
+#!/bin/bash
+s=`system_profiler SPUSBDataType | egrep "iPhone|Android" | wc -l ; system_profiler SPUSBDataType | grep 9101600073078b0a25e694ffeb69d656bfbdb869 | wc -l`
+echo $s
