@@ -78,7 +78,6 @@ void setup() {
  * Wait for something to happen
  */
 void loop() {
-
   char deviceStatus;
 
   deviceStatus = getDeviceStatus();
@@ -255,7 +254,7 @@ byte getUsbString(byte deviceAddr, byte index, char * sn)
 
   rCode = Usb.getStrDescr(deviceAddr, 0, 1, 0, 0, buf);  
 
-  if(rCode) {
+  if (rCode) {
     return rCode; // error retrieving LangID table length
   }
 
@@ -274,7 +273,7 @@ byte getUsbString(byte deviceAddr, byte index, char * sn)
 
   rCode = Usb.getStrDescr(deviceAddr, 0, 1, index, langId, buf);
 
-  if(rCode) {
+  if (rCode) {
     return rCode; // error retrieving string length
   }
 
@@ -282,11 +281,13 @@ byte getUsbString(byte deviceAddr, byte index, char * sn)
 
   // get string
 
-  rCode = Usb.getStrDescr( deviceAddr, 0, length, index, langId, buf );
+  rCode = Usb.getStrDescr(deviceAddr, 0, length, index, langId, buf);
 
   if (rCode) {
     return rCode; // error retrieving string
   }
+
+  // resulting string is unicode, so converting it to ascii
 
   byte sni = 0;
 
