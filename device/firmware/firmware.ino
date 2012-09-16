@@ -117,7 +117,6 @@ void loop() {
         // wait
         delay(700);
 
-
         // device is connected back
         if (deviceStatus == DEVICE_CONNECTED) {
           setLed(G);
