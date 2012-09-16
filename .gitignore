@@ -1,4 +1,4 @@
-app/
-test/
+mobile/
+tests/
 .DS_Store
 desktop/nbproject/
