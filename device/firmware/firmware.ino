@@ -1,7 +1,7 @@
 /**
  *  HandsOff
  *  (c) Mikhail Yurasov, 2012
- *  @version 1.1
+ *  @version 1.2
  */
 
 // output pins
@@ -27,6 +27,9 @@
 #define DEVICE_WAITING 1
 #define DEVICE_CONNECTED 2
 #define DEVICE_WRONG 3
+
+// serial number of unlocking device
+#define KEY_SN "9101600073078b0a25e694ffeb69d656bfbdb869"
 
  // macroses
 #define LOBYTE(x) ((char*)(&(x)))[0]
@@ -122,7 +125,7 @@ void loop() {
           setLed(G);
           return;
         }
-      } while (millis() - startMsWarning < 10000); // 10 sec
+      } while (millis() - startMsWarning < 15000); // 15 sec
 
       pumpState = OFF;
     }
@@ -172,7 +175,7 @@ char getDeviceStatus() {
 
     // compare SN
 
-    if (strcmp(serialNumber, "9101600073078b0a25e694ffeb69d656bfbdb869") == 0) {
+    if (strcmp(serialNumber, KEY_SN) == 0) {
       return DEVICE_CONNECTED;
     } else {
       return DEVICE_WRONG;
