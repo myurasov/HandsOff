@@ -1,7 +1,7 @@
 /**
  *  HandsOff
  *  (c) Mikhail Yurasov, 2012
- *  @version 1.0
+ *  @version 1.1
  */
 
 // output pins
@@ -21,12 +21,12 @@
 #define Y PIN_LED_Y
 #define G PIN_LED_G
 
- // device connection status
- #define DEVICE_ERROR -1
- #define DEVICE_DISCONNECTED 0
- #define DEVICE_WAITING 1
- #define DEVICE_CONNECTED 2
- #define DEVICE_WRONG 3
+// device connection status
+#define DEVICE_ERROR -1
+#define DEVICE_DISCONNECTED 0
+#define DEVICE_WAITING 1
+#define DEVICE_CONNECTED 2
+#define DEVICE_WRONG 3
 
  // macroses
 #define LOBYTE(x) ((char*)(&(x)))[0]
@@ -94,25 +94,36 @@ void loop() {
       setLed(OFF);
       pumpState = OFF;
     }
-  } else { // pump is ON
+  } else { // pump is ON, the car is probably running
     if (deviceStatus != DEVICE_CONNECTED) {
-
-      // device disconnected while car is probably running
-
-      long millisStart = millis();
+      long startMsWarning = millis();
+      char led = G;
 
       // check for device
-      while (millis() - millisStart < 5000) { // 5 seconds
-        //delay(100);
+      do {
+        // warning
+        led = led == G ? R : G;
+        setLed(led);
         beep();
-        deviceStatus = getDeviceStatus();
+
+        char startMsPoll = millis();
+        //
+        do {
+          // try to configure and switch on the device
+          deviceStatus = getDeviceStatus();
+          //delay(10);
+        } while (millis() - startMsPoll < 700); // 700 ms
+
+        // wait
+        delay(700);
 
 
-        // device is connexcted back
+        // device is connected back
         if (deviceStatus == DEVICE_CONNECTED) {
+          setLed(G);
           return;
         }
-      }
+      } while (millis() - startMsWarning < 10000); // 10 sec
 
       pumpState = OFF;
     }
@@ -197,10 +208,7 @@ void testPeripherals() {
  * Beep
  */
 void beep() {
-  tone(PIN_SPK, 1200, 333);
-  delay(350);
-  tone(PIN_SPK, 1200, 333);
-  delay(777 - 350);
+  tone(PIN_SPK, 1000, 333);
 }
 
 /**
