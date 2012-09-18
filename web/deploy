@@ -1,0 +1,10 @@
+#!/bin/bash
+
+server="sb-2"
+
+echo "Syncing..."
+ssh root@$server "mkdir -pv /Projects/HandsOff/web"
+rsync -avz --delete --exclude=".git" --exclude=".DS_Store" --exclude="*.tmp" \
+  /Projects/HandsOff/web/ \
+  root@$server:/Projects/HandsOff/web/
+ssh root@$server "chmod 0777 /Projects/HandsOff/web/oauthtoken.php"
