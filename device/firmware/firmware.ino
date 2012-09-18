@@ -1,16 +1,16 @@
 /**
  *  HandsOff
  *  (c) Mikhail Yurasov, 2012
- *  @version 1.2
+ *  @version 1.3
  */
 
 // output pins
-#define PIN_SPK 49
-#define PIN_LED_R 47
-#define PIN_LED_Y 45
-#define PIN_LED_G 43
-#define PIN_PUMP 46 // NO
-#define PIN_BUZZER 48 // NC
+#define PIN_SPK 48
+#define PIN_LED_R 46
+#define PIN_LED_Y 44
+#define PIN_LED_G 42
+#define PIN_PUMP 49 // NO
+#define PIN_BUZZER 47 // NC
 
 // on/off constants
 #define ON 1
@@ -22,11 +22,11 @@
 #define G PIN_LED_G
 
 // device connection status
-#define DEVICE_ERROR -1
-#define DEVICE_DISCONNECTED 0
-#define DEVICE_WAITING 1
-#define DEVICE_CONNECTED 2
-#define DEVICE_WRONG 3
+#define DEVICE_ERROR 0
+#define DEVICE_DISCONNECTED 1
+#define DEVICE_WAITING 2
+#define DEVICE_CONNECTED 3
+#define DEVICE_WRONG 4
 
 // serial number of unlocking device
 #define KEY_SN "9101600073078b0a25e694ffeb69d656bfbdb869"
@@ -39,16 +39,35 @@
 
 #include <Max3421e.h>
 #include <Usb.h>
+#include <LiquidCrystal.h>
+#include "melody.h";
 
 //
 
 MAX3421E Max;
 USB Usb;
+LiquidCrystal lcd(8, 13, 9, 4, 5, 6, 7);
 
 /**
  * Init
  */
 void setup() {
+
+  lcd.clear(); 
+  lcd.begin(16, 2);
+  lcd.setCursor(0,0); 
+  lcd.noBlink();
+  lcd.print("HandsOff"); 
+
+  // set buzzer off
+  setBuzzer(OFF);
+  
+  // play welcome melody
+  play_rtttl(song);
+
+  // set fuel pump off
+  setPump(OFF);
+
   // init pins
   pinMode(PIN_SPK, OUTPUT);
   pinMode(PIN_LED_G, OUTPUT);
@@ -56,12 +75,6 @@ void setup() {
   pinMode(PIN_LED_R, OUTPUT);
   pinMode(PIN_PUMP, OUTPUT);
   pinMode(PIN_BUZZER, OUTPUT);
-
-  // set fuel pump off
-  setPump(OFF);
-
-  // set buzzer off
-  setBuzzer(OFF);
 
   // init USB
   delay(100); // required to stabilize power
@@ -72,7 +85,38 @@ void setup() {
   // Serial.begin(9600);
 }
 
- char pumpState = OFF;
+/**
+ * Display status on LCD
+ */
+void setStatusText(char deviceStatus) {
+  static char oldStatus = -1;
+  char * text;
+
+  if (deviceStatus == DEVICE_CONNECTED) {
+    text = "OK / Connected";
+  } else if (deviceStatus == DEVICE_WRONG) {
+    text = "Wrong Phone";
+  } else if (deviceStatus == DEVICE_DISCONNECTED) {
+    text = "Disconnected";
+  } else if (deviceStatus == DEVICE_ERROR) {
+    text = "Device Error";
+  } else if (deviceStatus == DEVICE_WAITING) {
+    text = "Waiting";
+  } else {
+    text = "...";
+  }
+
+  if (oldStatus != deviceStatus) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Status:");
+    lcd.setCursor(0, 1);
+    lcd.print(text);
+    oldStatus = deviceStatus;
+  }
+}
+
+char pumpState = OFF;
 
 /**
  * Wait for something to happen
@@ -81,8 +125,10 @@ void loop() {
   char deviceStatus;
 
   deviceStatus = getDeviceStatus();
+  setStatusText(deviceStatus);
 
   if (pumpState == OFF) {
+
     if (deviceStatus == DEVICE_CONNECTED) {
       setLed(G);
       pumpState = ON;
@@ -106,24 +152,32 @@ void loop() {
         // warning
         led = led == G ? R : G;
         setLed(led);
-        beep();
+        //beep();
+        setBuzzer(ON);
+        // buzz();
 
-        char startMsPoll = millis();
-        //
+        long startMsPoll = millis();
+        
         do {
           // try to configure and switch on the device
           deviceStatus = getDeviceStatus();
-          //delay(10);
-        } while (millis() - startMsPoll < 700); // 700 ms
+          
+          // set buzzer off
+          if (millis() - startMsPoll >= 500) {
+            setBuzzer(OFF);
+          }
 
-        // wait
-        delay(700);
+          // device is connected back
+          if (deviceStatus == DEVICE_CONNECTED) {
+            setLed(G);
+            setBuzzer(OFF);
+            return;
+          }
 
-        // device is connected back
-        if (deviceStatus == DEVICE_CONNECTED) {
-          setLed(G);
-          return;
-        }
+          delay(20);
+        } while (millis() - startMsPoll < 1000); // 700 ms
+
+        setBuzzer(OFF);
       } while (millis() - startMsWarning < 15000); // 15 sec
 
       pumpState = OFF;
@@ -131,7 +185,7 @@ void loop() {
   }
 
   setPump(pumpState);
-  delay(200);
+  delay(333);
 }
 
 /**
@@ -210,6 +264,15 @@ void testPeripherals() {
  */
 void beep() {
   tone(PIN_SPK, 1000, 333);
+}
+
+/**
+ * Buzz
+ */
+void buzz() {
+  setBuzzer(ON);
+  delay(500);
+  setBuzzer(OFF);
 }
 
 /**
