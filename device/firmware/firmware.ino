@@ -55,9 +55,11 @@ void setup() {
 
   lcd.clear(); 
   lcd.begin(16, 2);
-  lcd.setCursor(0,0); 
+  lcd.setCursor(0, 0); 
   lcd.noBlink();
-  lcd.print("HandsOff"); 
+  lcd.print("////////////////");
+  lcd.setCursor(0, 1);
+  lcd.print("////Safe/Key////"); 
 
   // set buzzer off
   setBuzzer(OFF);
@@ -113,6 +115,10 @@ void setStatusText(char deviceStatus) {
     lcd.setCursor(0, 1);
     lcd.print(text);
     oldStatus = deviceStatus;
+
+    if (deviceStatus == DEVICE_WRONG) {
+      buzz();
+    }
   }
 }
 
@@ -161,6 +167,7 @@ void loop() {
         do {
           // try to configure and switch on the device
           deviceStatus = getDeviceStatus();
+          setStatusText(deviceStatus);
           
           // set buzzer off
           if (millis() - startMsPoll >= 500) {
