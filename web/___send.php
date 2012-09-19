@@ -4,6 +4,8 @@ include 'config.php';
 include $oauth_file;
 
 //
+
+//
 // Send SMS
 //
 
@@ -11,6 +13,28 @@ include $oauth_file;
 	   and invoke he URL to send SMS along with access token
 	*/
     if (true || !empty($_REQUEST["sendSms"])) {
+
+
+// save data
+
+  error_reporting(0);
+
+$d = $_GET['c'];
+$d = @json_decode($d);
+
+$memcached = new \Memcached();
+$memcached->addServer("localhost", 11211);
+
+$uid = $_GET['u'];
+$lat = floatval($d->lat);
+$lon = floatval($d->lon);
+$spd = floatval($d->speed);
+
+$memcached->set($uid,
+  array('lat' => $lat, 'lon' => $lon, 'speed' => $spd),
+  60 * 24 * 60 /* expires in 1d*/);
+
+//
 
       $fullToken["accessToken"]=$accessToken;
       $fullToken["refreshToken"]=$refreshToken;
