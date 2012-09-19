@@ -5,6 +5,7 @@
  */
 
 var MainWindow = require("modules/UI/MainWindow");
+var Utils = require("lib/mym/Utils");
 
 exports = function () {
   var self = this;
@@ -33,6 +34,23 @@ exports = function () {
     Ti.App.fireEvent("_location", e);
   }
 
+  self.sendMessage = function (locked, textLog) {
+    if (App.Config.get("smsAlerts")) {
+      var uid = Utils.createUID(7, Utils.ALPHABET_HEX);
+      var state = locked ? "locked" : "unlocked";
+
+      Ti.Geolocation.getCurrentPosition(function (e) {
+        if (e.coords) {
+          var body = "Car " + state + " at http://sk.managebytes.com/{u}, the speed is " + Math.max(0, Math.round(e.coords.speed / 1.6)) + "mph";
+          body = body.replace("{u}", uid);
+          App.sendSMS(App.Config.get("smsPhone"), body, textLog, e.coords, uid);
+        } else {
+          App.sendSMS(App.Config.get("smsPhone"), "Car " + state, textLog, null, uid);
+        }
+      });
+    }
+  }
+
   /**
    * Start app
    */
@@ -59,18 +77,27 @@ exports = function () {
     tabGroup.open();
   };
 
-  self.sendSMS = function (phone, body, textLog) {
+  self.sendSMS = function (phone, body, textLog, coords, uid) {
     if (textLog == undefined) {
       textLog = false;
     }
 
-    var url = "http://sk.managebytes.com/___send.php?t={t}&m={m}&nocache=" + Math.random();
+    var url = "http://sk.managebytes.com/___send.php?t={t}&m={m}&c={c}&u={u}&nocache=" + Math.random();
 
     phone = phone.replace(/\D/g, ""); // remove non-numbers
     //phone = "425-615-5870"; // remove non-numbers
 
     url = url.replace("{t}", encodeURIComponent(phone));
     url = url.replace("{m}", encodeURIComponent(body));
+    url = url.replace("{u}", encodeURIComponent(uid));
+
+    url = url.replace("{c}", coords === null ? "null" :  encodeURIComponent(JSON.stringify({
+      lat: coords.latitude,
+      lon: coords.longitude,
+      speed: coords.speed
+    })));
+
+    Titanium.API.info(url); // xxx
 
     var xhr = Ti.Network.createHTTPClient();
     xhr.timeout = 45 * 1000;

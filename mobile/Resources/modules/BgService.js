@@ -10,7 +10,4 @@ Ti.include("Config.js");
 
 Titanium.API.info("entered bg mode"); // xxx
 
-
-var body = "Car unlocked, speed: 1mph";
-
-App.sendSMS(App.Config.get("smsPhone"), body, true);
+App.sendMessage(true, true);

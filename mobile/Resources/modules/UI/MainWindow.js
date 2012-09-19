@@ -59,7 +59,11 @@ var createMainWindow = function(options)
     //
 
     logTable = Ti.UI.createTableView({
-      top: 250
+      bottom: 10,
+      left: 10,
+      right: 10,
+      height: 155,
+      borderRadius: 5
     });
 
     view.add(logTable);
@@ -100,16 +104,7 @@ var createMainWindow = function(options)
     });
 
     view.addEventListener("open", function(e){
-
-      var body;
-
-      if (App.coords) {
-        body = "Car unlocked, speed: " + Math.max(Math.round(App.coords.speed / 1.6), 0) + "mph";
-      } else {
-        body = "Car unlocked";
-      }
-
-      App.sendSMS(App.Config.get("smsPhone"), body);
+      App.sendMessage(false, false);
     });
   }
 

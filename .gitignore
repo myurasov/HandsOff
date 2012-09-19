@@ -2,3 +2,4 @@ mobile/build/
 tests/
 .DS_Store
 desktop/nbproject/
+/web/nbproject/private/
